@@ -35,4 +35,4 @@ const User = mongoose.model("User", {
   },
 });
 
-exports.default = User;
+module.exports = User;
