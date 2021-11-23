@@ -30,8 +30,12 @@ const find = async (request, response) => {
     });
 }
 
-// const update = async (request, response) => {
+const update = async (request, response) => {
 
-// }
+}
 
-module.exports = { create, list, find, update }
+const remove = async (request, response) => {
+
+}
+
+module.exports = { create, list, find, update, remove }

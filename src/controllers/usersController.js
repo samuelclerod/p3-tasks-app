@@ -1,4 +1,3 @@
-const { findByIdAndDelete } = require("../models/User");
 const User = require("../models/User");
 
 const create = async (request, response) => {
@@ -33,22 +32,22 @@ const find = async (request, response) => {
   }
 }
 
-const areValidFields = (body) => {
-  const fields = Object.keys(body)
-  const allowedFields = ["name", "email", "password", "age"];
-  return fields.every(field => allowedFields.includes(field))
-}
 
 const update = async (request, response) => {
-  const id = request.params.id;
-  if (!areValidFields(request.body)) {
+  const fields = Object.keys(request.body)
+  const allowedFields = ["name", "email", "password", "age"];
+  const valid = fields.every(field => allowedFields.includes(field))
+  if (!valid) {
     return response.status(400).send({ error: 'invalid fields' })
   }
+
   try {
-    const user = await User.findByIdAndUpdate(id, request.body, {
-      new: true,
-      runValidators: true,
-    })
+    const id = request.params.id;
+    const user = await User.findById(id);
+    if (!user) response.status(404).send();
+    fields.forEach(field => user[field] = request.body[field])
+    await user.save()
+
     response.status(200).send(user)
   } catch (error) {
     response.status(400).send({

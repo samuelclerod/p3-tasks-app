@@ -1,7 +1,8 @@
-const mongoose = require("mongoose");
+const { Schema, model } = require("mongoose");
 const validator = require("validator");
+const bcrypt = require('bcryptjs')
 
-const User = mongoose.model("User", {
+const userSchema = new Schema({
   name: {
     type: String,
     trim: true,
@@ -9,6 +10,7 @@ const User = mongoose.model("User", {
   },
   email: {
     type: String,
+    unique: [true, 'This e-mail already taken'],
     required: true,
     trim: true,
     validate: (value) => {
@@ -28,11 +30,22 @@ const User = mongoose.model("User", {
     minLength: 6,
     trim: true,
     validate: (value) => {
-      console.log(value);
       if (value.toLowerCase().includes("password"))
         throw new Error("You can not use the word `password` as password.");
     },
   },
-});
+})
+
+userSchema.pre("save", async function (next) {
+  const user = this;
+
+  if (user.isModified('password')) {
+    user.password = await bcrypt.hash(user.password, 8);
+  }
+
+  next();
+})
+
+const User = model("User", userSchema);
 
 module.exports = User;
