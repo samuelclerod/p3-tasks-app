@@ -1,5 +1,7 @@
 const { response, query } = require("express");
 const express = require("express");
+const Task = require("./models/Task");
+const User = require("./models/User");
 
 require("./db/mongoose");
 const routes = require('./routes');
@@ -7,23 +9,27 @@ const routes = require('./routes');
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use((request, response, next) => {
+  console.log(`${request.method} => ${request.path}`);
+  next();
+})
+
 app.use(express.json());
 app.use('/', routes);
 
 app.listen(port, () => console.log(`🚀 Running on port ${port} 🧑‍🚀`));
 
 
-// const myFunction = async () => {
-//   const password = 'unijuazeiro123';;
-//   const hashedPassword = await bcrypt.hash(password, 8);
+const main = async () => {
+  // const task = await Task.findById('61a6b96ddd61f5288807a2a6')
+  // await task.populate('owner')
+  // console.log(task.owner.name)
 
-//   console.log('Password: ' + password)
-//   console.log('hashedPassword: ' + hashedPassword)
+  // const user = await User.findById('61a6b925dd61f5288807a293');
+  // await user.populate('tasks')
+  // console.log(user.tasks)
+
+}
 
 
-//   const isMatch = await bcrypt.compare('unijuazeiro123', hashedPassword)
-//   console.log(isMatch)
-
-// }
-
-// myFunction()
+main()

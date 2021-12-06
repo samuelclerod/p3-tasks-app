@@ -1,7 +1,7 @@
-const User = require("../models/Task");
+const Task = require("../models/Task");
 
 const create = async (request, response) => {
-  const task = new Task(request.body);
+  const task = new Task({ ...request.body, owner: request.user._id });
   task
     .save()
     .then(() => response.status(201).send(task))
@@ -9,25 +9,25 @@ const create = async (request, response) => {
 }
 
 const list = async (request, response) => {
-  Task.find({})
-    .then((tasks) => {
-      response.send(tasks);
-    })
-    .catch((error) => {
-      response.status(500).send();
-    });
+
+  try {
+    await request.user.populate('tasks')
+    response.send(request.user.tasks)
+  } catch (error) {
+    response.status(500).send();
+  }
 }
 
 const find = async (request, response) => {
   const id = request.params.id;
-  Task.findById(id)
-    .then((task) => {
-      if (task) response.send(task);
-      response.status(404).send();
-    })
-    .catch((error) => {
-      response.status(500).send();
-    });
+
+  try {
+    const task = await Task.findOne({ _id: id, owner: request.user._id })
+    if (task) response.send(task);
+    response.status(404).send();
+  } catch (error) {
+    response.status(500).send();
+  }
 }
 
 const update = async (request, response) => {
